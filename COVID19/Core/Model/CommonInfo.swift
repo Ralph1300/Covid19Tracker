@@ -38,7 +38,6 @@ struct CommonInfo {
         }
     }
 
-
     let currentInfections: Int
     let positives: Int
     let recovered: Int

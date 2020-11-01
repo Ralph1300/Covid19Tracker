@@ -9,42 +9,51 @@ import WidgetKit
 import SwiftUI
 import Intents
 
-struct Provider: IntentTimelineProvider {
+struct Provider: TimelineProvider {
+
+    typealias Entry = SimpleEntry
+
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), configuration: ConfigurationIntent())
+        SimpleEntry(date: Date(), currentInfections: 100, increasedBy: 10)
     }
 
-    func getSnapshot(for configuration: ConfigurationIntent, in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(date: Date(), configuration: configuration)
+    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
+        let entry = SimpleEntry(date: Date(), currentInfections: 100, increasedBy: 10)
         completion(entry)
     }
 
-    func getTimeline(for configuration: ConfigurationIntent, in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-        var entries: [SimpleEntry] = []
-
-        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
+    func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
         let currentDate = Date()
-        for hourOffset in 0 ..< 5 {
-            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, configuration: configuration)
-            entries.append(entry)
+        let userDefaults = UserDefaults(suiteName: "group.covid19")
+        guard let data = userDefaults?.value(forKey: WidgetInfo.key) as? Data, let info = try? JSONDecoder().decode(WidgetInfo.self, from: data) else {
+            completion(Timeline(entries: [], policy: .atEnd))
+            return
         }
+        let entry = Entry(date: currentDate,
+                          currentInfections: info.infections,
+                          increasedBy: info.increasedBy)
 
-        let timeline = Timeline(entries: entries, policy: .atEnd)
+        let timeline = Timeline(entries: [entry], policy: .atEnd)
         completion(timeline)
     }
 }
 
 struct SimpleEntry: TimelineEntry {
     let date: Date
-    let configuration: ConfigurationIntent
+    let currentInfections: Int
+    let increasedBy: Int
 }
 
 struct Covid19WidgetEntryView : View {
     var entry: Provider.Entry
 
     var body: some View {
-        Text(entry.date, style: .time)
+        VStack(alignment: .leading, spacing: 8, content: {
+            Text("Current Infections").font(.callout)
+            Text("\(entry.currentInfections)")
+                .font(.body)
+            Text("+\(entry.increasedBy)").font(.body).foregroundColor(.red)
+        })
     }
 }
 
@@ -53,17 +62,18 @@ struct Covid19Widget: Widget {
     let kind: String = "Covid19Widget"
 
     var body: some WidgetConfiguration {
-        IntentConfiguration(kind: kind, intent: ConfigurationIntent.self, provider: Provider()) { entry in
+        StaticConfiguration(kind: kind, provider: Provider()) { entry in
             Covid19WidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("My Widget")
-        .description("This is an example widget.")
+        .configurationDisplayName("Covid 19 Tracker")
+        .description("Current Covid19 Numbers")
+        .supportedFamilies([.systemSmall])
     }
 }
 
 struct Covid19Widget_Previews: PreviewProvider {
     static var previews: some View {
-        Covid19WidgetEntryView(entry: SimpleEntry(date: Date(), configuration: ConfigurationIntent()))
+        Covid19WidgetEntryView(entry: SimpleEntry(date: Date(), currentInfections: 100, increasedBy: 10))
             .previewContext(WidgetPreviewContext(family: .systemSmall))
     }
 }

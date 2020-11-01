@@ -9,6 +9,8 @@ import Combine
 import Foundation
 import UIKit
 
+import WidgetKit
+
 final class GeneralViewViewModel: ObservableObject {
 
     struct Info: Identifiable, Equatable {
@@ -25,6 +27,7 @@ final class GeneralViewViewModel: ObservableObject {
     }
 
     private let remote: Remote
+    private let userDefaults = UserDefaults(suiteName: "group.covid19")
     private(set) var infos: [Info] = []
     private var cancellables: [AnyCancellable] = []
 
@@ -121,6 +124,20 @@ final class GeneralViewViewModel: ObservableObject {
         self.infos = infos
     }
 
+    private func storeWidgetInformation() {
+        guard let increasedBy = infectedIncrease, let commonInfo = commonInfo else {
+            return
+        }
+        let widgetInfo = WidgetInfo(infections: commonInfo.currentInfections,
+                                    increasedBy: increasedBy)
+        guard let data = try? JSONEncoder().encode(widgetInfo) else {
+            return
+        }
+        userDefaults?.set(data, forKey: WidgetInfo.key)
+        userDefaults?.synchronize()
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
     // MARK: - Internal
 
     func reload() {
@@ -138,6 +155,7 @@ final class GeneralViewViewModel: ObservableObject {
             } receiveValue: { [weak self] info, epiCurve in
                 self?.epiCurve = epiCurve
                 self?.commonInfo = info
+                self?.storeWidgetInformation()
             }
             .store(in: &cancellables)
     }
