@@ -19,17 +19,12 @@ struct MainView: View {
             GeneralView()
                 .tabItem {
                     Image(systemName: "heart.circle")
-                    Text("General")
+                    Text("Heute")
                 }
             StateView()
                 .tabItem {
                     Image(systemName: "person.circle")
-                    Text("States")
-                }
-            WorldView()
-                .tabItem {
-                    Image(systemName: "a.circle.fill")
-                    Text("Global")
+                    Text("Bund")
                 }
         }
     }

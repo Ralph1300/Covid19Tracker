@@ -27,6 +27,8 @@ final class Remote {
         case common = "https://info.gesundheitsministerium.at/data/AllgemeinDaten.csv"
         case state = "https://info.gesundheitsministerium.at/data/Bundesland.csv"
         case epiCurve = "https://info.gesundheitsministerium.at/data/Epikurve.csv"
+        case provinceTimeline = "https://covid19-dashboard.ages.at/data/CovidFaelle_Timeline.csv"
+        case caseNumbersAndHospitals = "https://covid19-dashboard.ages.at/data/CovidFallzahlen.csv"
 
         var url: URL {
             return URL(string: self.rawValue)!
@@ -64,6 +66,28 @@ final class Remote {
             .receive(on: DispatchQueue.main)
             .map { try? CSVParser.parseEpiCurve(from: $0) }
             .replaceNil(with: EpiCurve(dateStamp: Date(), entries: []))
+            .mapError { _ in NetworkError.unknown }
+            .eraseToAnyPublisher()
+    }
+
+    func fetchProvinceTimeline() -> AnyPublisher<[ProvinceTimelineInformation], NetworkError> {
+        return makePublisher(for: .provinceTimeline)
+    }
+
+    func fetchTestsAndHospitalTimeline() -> AnyPublisher<[TestAndHospitalTimelineInformation], NetworkError> {
+        return makePublisher(for: .caseNumbersAndHospitals)
+    }
+
+    // MARK: - Private
+
+    private func makePublisher<T: CSVParsable>(for endpoint: Endpoint) -> AnyPublisher<[T], NetworkError> {
+        urlSession
+            .dataTaskPublisher(for: endpoint.url)
+            .map(\.data)
+            .map { String(data: $0, encoding: .utf8) ?? "" }
+            .receive(on: DispatchQueue.main)
+            .map { try? NewCSVParser().parse(data: $0) }
+            .replaceNil(with: [])
             .mapError { _ in NetworkError.unknown }
             .eraseToAnyPublisher()
     }

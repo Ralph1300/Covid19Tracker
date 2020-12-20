@@ -158,5 +158,15 @@ final class GeneralViewViewModel: ObservableObject {
                 self?.storeWidgetInformation()
             }
             .store(in: &cancellables)
+
+        remote.fetchProvinceTimeline().sink(receiveCompletion: { _ in }) { values in
+            print(values.count)
+        }
+        .store(in: &cancellables)
+
+        remote.fetchTestsAndHospitalTimeline().sink(receiveCompletion: { _ in }) { values in
+            print(values.count)
+        }
+        .store(in: &cancellables)
     }
 }

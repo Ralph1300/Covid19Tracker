@@ -41,7 +41,7 @@ struct GeneralView: View {
                              infoText: "This graph shows the last 20 days and the new infections on those days.",
                              isPresented: $showsPositivesChart)
             }
-            .navigationTitle("General Information")
+            .navigationTitle("Heute")
             .navigationBarItems(trailing:
                 Button(action: {
                     self.viewModel.reload()
@@ -83,8 +83,6 @@ private struct GeneralListView: View {
                             didTapInfo(info)
                         }
                     }
-                    Text("Last update: \(formattedDate)")
-                        .padding(.vertical)
                 })
             }
         }

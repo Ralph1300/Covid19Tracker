@@ -14,25 +14,26 @@ struct GeneralContentViewItem: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 24)
-                .fill(Color(UIColor.systemGray2))
+                .fill(Color.secondary)
                 .padding(.horizontal)
-                .shadow(radius: 10)
 
             HStack(spacing: 8) {
                 Image(uiImage: info.icon)
                 .resizable()
                     .renderingMode(.template)
                     .aspectRatio(contentMode: .fit)
-                    .foregroundColor(.primary)
+                    .foregroundColor(.white)
                     .frame(width: 24, height: 24)
                     .padding(EdgeInsets(top: 24, leading: 32, bottom: 24, trailing: 0))
                 VStack(alignment: .leading, spacing: 8.0) {
-                    Text(info.title.uppercased()).font(.subheadline)
+                    Text(info.title)
+                        .foregroundColor(.white)
+                        .font(.subheadline)
                         .fontWeight(.bold)
                     HStack(spacing: 4) {
                         Text(info.subTitle)
                             .font(.body)
-                            .foregroundColor(.primary)
+                            .foregroundColor(.white)
                         if let increase = info.increase {
                             Text("+\(increase)")
                                 .font(.body)

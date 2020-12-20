@@ -21,19 +21,19 @@ struct CommonInfo {
         var text: String {
             switch self {
             case .currentInfections:
-                return "Current Infections"
+                return "Aktive Fälle"
             case .positives:
                 return "Positive Tests"
             case .tests:
-                return "Tests"
+                return "Durchgeführte Tests"
             case .recovered:
-                return "Recovered"
+                return "Genesen"
             case .dead:
-                return "Dead"
+                return "Verstorben"
             case .availableNormalBedsPercentage:
-                return "Available Care Beds"
+                return "Verfügbare Krankenhausbetten"
             case .availableIntensiveCareBeds:
-                return "Available Intensive Care Beds"
+                return "Verfügbare Intensivbetten"
             }
         }
     }

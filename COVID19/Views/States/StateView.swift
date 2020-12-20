@@ -18,22 +18,22 @@ struct StateView: View {
     var body: some View {
         NavigationView {
             Group {
-                if viewModel.stateInfos.isEmpty {
+                if viewModel.timelineInfos.isEmpty {
                     ProgressView()
                 } else {
                     ScrollView {
                         VStack(spacing: 8) {
-                            ForEach(viewModel.stateInfos) { info in
-                                StateInfoItem(stateInfo: info,
-                                              formattedDate: viewModel.formattedDate)
+                            ForEach(viewModel.timelineInfos) { model in
+                                OverviewItemView(model: model)
                             }
                             Color.clear
                         }
                     }
                 }
             }
-            .navigationTitle("State Information")
+            .navigationTitle("Bundesländer")
         }
+        .background(Color.primary)
         .onAppear {
             viewModel.load()
         }
