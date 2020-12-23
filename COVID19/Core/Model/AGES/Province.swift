@@ -8,7 +8,16 @@
 import Foundation
 
 enum Province: Int {
-    case burgenland = 1, carinthia, lowerAustria, upperAustria, salzburg, styria, vorarlberg, vienna, austria
+    case burgenland = 1
+    case carinthia = 2
+    case lowerAustria = 3
+    case upperAustria = 4
+    case salzburg = 5
+    case styria = 6
+    case tyrol = 7
+    case vorarlberg = 8
+    case vienna = 9
+    case austria = 10
 
     var provinceName: String {
         switch self {
@@ -26,6 +35,8 @@ enum Province: Int {
             return "Steiermark"
         case .upperAustria:
             return "Oberösterreich"
+        case .tyrol:
+            return "Tirol"
         case .vienna:
             return "Wien"
         case .vorarlberg:

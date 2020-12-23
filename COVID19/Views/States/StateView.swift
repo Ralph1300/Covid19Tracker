@@ -10,6 +10,9 @@ import SwiftUI
 struct StateView: View {
     
     @ObservedObject var viewModel: StateViewModel
+    @State var showsDetails = false
+
+    @State var selectedModel: OverviewItemModel?
 
     init(viewModel: StateViewModel = .init()) {
         self.viewModel = viewModel
@@ -24,12 +27,18 @@ struct StateView: View {
                     ScrollView {
                         VStack(spacing: 8) {
                             ForEach(viewModel.timelineInfos) { model in
-                                OverviewItemView(model: model)
+                                OverviewItemView(model: model) { tappedModel in
+                                    self.selectedModel = tappedModel
+                                    showsDetails = true
+                                }
                             }
                             Color.clear
                         }
                     }
                 }
+            }
+            .sheet(isPresented: $showsDetails) {
+
             }
             .navigationTitle("Bundesländer")
         }

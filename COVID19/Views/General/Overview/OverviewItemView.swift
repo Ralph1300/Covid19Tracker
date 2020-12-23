@@ -19,6 +19,7 @@ enum RowInfoTextType {
 
 struct OverviewItemView: View {
     let model: OverviewItemModel
+    let didTap: (OverviewItemModel) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -53,6 +54,9 @@ struct OverviewItemView: View {
                 .padding(.all, 8)
             }
             .fixedSize(horizontal: false, vertical: true)
+            .onTapGesture {
+                didTap(model)
+            }
         }
         .padding(.horizontal)
     }
@@ -79,7 +83,7 @@ struct OverviewItemView: View {
 
 struct OverviewItem_Previews: PreviewProvider {
     static var previews: some View {
-        OverviewItemView(model: .stub())
+        OverviewItemView(model: .stub(), didTap: { _ in })
     }
 }
 
