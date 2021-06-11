@@ -37,9 +37,6 @@ struct StateView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showsDetails) {
-
-            }
             .navigationTitle("Bundesländer")
         }
         .background(Color.primary)
