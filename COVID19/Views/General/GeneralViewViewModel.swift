@@ -146,19 +146,6 @@ final class GeneralViewViewModel: ObservableObject {
     }
 
     func load() {
-        let commonInformationPublisher = remote.fetchCommonInformation()
-        let epiCurvePublisher = remote.fetchEpiCurve()
-
-        Publishers.Zip(commonInformationPublisher, epiCurvePublisher)
-            .sink { _ in
-                self.state = .loaded
-            } receiveValue: { [weak self] info, epiCurve in
-                self?.epiCurve = epiCurve
-                self?.commonInfo = info
-                self?.storeWidgetInformation()
-            }
-            .store(in: &cancellables)
-
         remote.fetchProvinceTimeline().sink(receiveCompletion: { _ in }) { values in
             print(values.count)
         }
