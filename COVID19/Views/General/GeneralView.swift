@@ -36,10 +36,6 @@ struct GeneralView: View {
                 }
             }
             .sheet(isPresented: $showsPositivesChart) {
-                BarChartView(entries: viewModel.entries,
-                             title: "Positives",
-                             infoText: "This graph shows the last 20 days and the new infections on those days.",
-                             isPresented: $showsPositivesChart)
             }
             .navigationTitle("Heute")
             .navigationBarItems(trailing:

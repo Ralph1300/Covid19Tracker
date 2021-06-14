@@ -26,6 +26,7 @@ final class Remote {
     enum Endpoint: String {
         case provinceTimeline = "https://covid19-dashboard.ages.at/data/CovidFaelle_Timeline.csv"
         case caseNumbersAndHospitals = "https://covid19-dashboard.ages.at/data/CovidFallzahlen.csv"
+        case numbersForState = "https://info.gesundheitsministerium.gv.at/data/timeline-faelle-bundeslaender.csv"
 
         var url: URL {
             return URL(string: self.rawValue)!

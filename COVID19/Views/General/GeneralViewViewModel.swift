@@ -43,13 +43,13 @@ final class GeneralViewViewModel: ObservableObject {
         }
     }
     @Published var state: LoadingState = .loading
-    @Published var epiCurve: EpiCurve?
+//    @Published var epiCurve: EpiCurve?
 
     var infectedIncrease: Int? {
-        guard let lastInfectedRaise = epiCurve?.entries.last?.cases else {
-            return nil
-        }
-        return lastInfectedRaise
+//        guard let lastInfectedRaise = epiCurve?.entries.last?.cases else {
+//            return nil
+//        }
+        return nil
     }
 
     var formattedDate: String {
@@ -57,17 +57,6 @@ final class GeneralViewViewModel: ObservableObject {
             return ""
         }
         return dateFormatter.string(from: info.lastRefresh)
-    }
-
-    var entries: [BarChartEntry] {
-        guard let epiCurveEntries = epiCurve?.entries.suffix(20) else {
-            return []
-        }
-
-        return epiCurveEntries.map {
-            BarChartEntry(value: $0.cases,
-                          footnote: "\($0.cases)")
-        }
     }
 
     init(remote: Remote = .shared, commonInfo: CommonInfo? = nil) {

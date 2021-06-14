@@ -17,6 +17,12 @@ final class NewCSVParser {
         case unknown
         case empty
     }
+    
+    private lazy var dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = ""
+        return dateFormatter
+    }()
 
     func parse<T: CSVParsable>(data: String) throws -> [T] {
         let allRows = Array(data.split(separator: "\n"))

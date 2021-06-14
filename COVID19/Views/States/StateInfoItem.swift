@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct StateInfoItem: View {
-    let stateInfo: StateInfo
     let formattedDate: String
     var body: some View {
 
@@ -19,18 +18,18 @@ struct StateInfoItem: View {
                 .padding(.horizontal)
             HStack {
                 VStack(alignment: .leading, spacing: 8.0) {
-                    Text(stateInfo.name.uppercased()).font(.title)
+                    Text("Test").font(.title)
                         .fontWeight(.bold)
                     HStack(spacing: 12) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Active Cases")
-                            Text("\(stateInfo.activeCases)")
+                            Text("")
                                 .foregroundColor(.primary)
                         }
 
                         VStack(alignment: .leading, spacing: 4) {
                             Text("GKZ")
-                            Text("\(stateInfo.gkz)")
+                            Text("")
                                 .foregroundColor(.primary)
                         }
 
@@ -51,6 +50,6 @@ struct StateInfoItem: View {
 
 struct StateInfoItem_Previews: PreviewProvider {
     static var previews: some View {
-        StateInfoItem(stateInfo: .stub(), formattedDate: "Today")
+        StateInfoItem(formattedDate: "Today")
     }
 }
