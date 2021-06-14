@@ -20,6 +20,28 @@ struct TimelineStates: CSVParsable {
     let pcrTests: Int
     let antigenTests: Int
     
+    enum InfoType: CaseIterable {
+        case cases, deaths, recovered, hospitalized, intenseCare
+        case tests
+        
+        var text: String {
+            switch self {
+            case .cases:
+                return "Cases"
+            case .deaths:
+                return "Deaths"
+            case .hospitalized:
+                return "Hospitalized"
+            case .intenseCare:
+                return "Intensice Care"
+            case .recovered:
+                return "Recovered"
+            case .tests:
+                return "Tests"
+            }
+        }
+    }
+    
     init(date: Date, province: Province, confirmedCases: Int, deaths: Int, recovered: Int, hospitalized: Int, intensiveCare: Int, tests: Int, pcrTests: Int, antigenTests: Int) {
         self.date = date
         self.province = province
@@ -33,8 +55,8 @@ struct TimelineStates: CSVParsable {
         self.antigenTests = antigenTests
     }
     
-    init(dict: [String : Any], parser: NewCSVParser) throws {
-        self.date = Date()
+    init(dict: [String :Any], parser: NewCSVParser) throws {
+        self.date = parser.convertToDate(string: (dict["Datum"] as? NSString ?? "") as String) ?? Date()
         self.province = Province(rawValue: parser.convertToInt(value: dict["BundeslandID"])) ?? .austria
         self.confirmedCases = parser.convertToInt(value: dict["BestaetigteFaelleBundeslaender"])
         self.deaths = parser.convertToInt(value: dict["Todesfaelle"])
@@ -44,5 +66,9 @@ struct TimelineStates: CSVParsable {
         self.tests = parser.convertToInt(value: dict["Testungen"])
         self.pcrTests = parser.convertToInt(value: dict["TestungenPCR"])
         self.antigenTests = parser.convertToInt(value: dict["TestungenAntigen"])
+    }
+    
+    static func stub() -> TimelineStates {
+        return TimelineStates(date: Date(), province: .austria, confirmedCases: 100, deaths: 100, recovered: 100, hospitalized: 100, intensiveCare: 100, tests: 100, pcrTests: 100, antigenTests: 100)
     }
 }

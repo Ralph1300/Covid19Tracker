@@ -20,12 +20,13 @@ final class NewCSVParser {
     
     private lazy var dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = ""
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         return dateFormatter
     }()
 
     func parse<T: CSVParsable>(data: String) throws -> [T] {
-        let allRows = Array(data.split(separator: "\n"))
+        let lineBreakType = lineBreakType(for: data)
+        let allRows = Array(data.split(separator: lineBreakType.modifier))
         guard let header = allRows.first?.split(separator: ";") else {
             throw ParsingError.empty
         }
@@ -55,5 +56,30 @@ final class NewCSVParser {
         }
         let correctFloatingPointString = (valueAsNSString as String).replacingOccurrences(of: ",", with: ".")
         return Double(correctFloatingPointString) ?? 0
+    }
+
+    func convertToDate(string: String) -> Date? {
+        return dateFormatter.date(from: string)
+    }
+    
+    private enum LineBreakType {
+        case mac
+        case windows
+        
+        var modifier: Character {
+            switch self {
+            case .mac:
+                return "\n"
+            case .windows:
+                return "\r\n"
+            }
+        }
+    }
+    
+    private func lineBreakType(for data: String) -> LineBreakType {
+        if data.contains(LineBreakType.windows.modifier) {
+            return .windows
+        }
+        return .mac
     }
 }

@@ -40,6 +40,10 @@ final class Remote {
     func fetchTestsAndHospitalTimeline() -> AnyPublisher<[TestAndHospitalTimelineInformation], NetworkError> {
         return makePublisher(for: .caseNumbersAndHospitals)
     }
+    
+    func fetchStateTimeline() -> AnyPublisher<[TimelineStates], NetworkError> {
+        return makePublisher(for: .numbersForState)
+    }
 
     // MARK: - Private
 

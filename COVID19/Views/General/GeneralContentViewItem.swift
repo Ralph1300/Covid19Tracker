@@ -59,13 +59,13 @@ struct GeneralContentViewItem_Previews: PreviewProvider {
                                     GeneralViewViewModel.Info(icon: UIImage(systemName: "heart.fill")!,
                                                               title: "Active Cases", subTitle: "2876",
                                                               increase: 10,
-                                                              type: .availableIntensiveCareBeds),
+                                                              type: .cases),
                                    didTap: {})
             GeneralContentViewItem(info:
                                     GeneralViewViewModel.Info(icon: UIImage(systemName: "heart.fill")!,
                                                               title: "Active Cases", subTitle: "2876",
                                                               increase: nil,
-                                                              type: .availableIntensiveCareBeds),
+                                                              type: .cases),
                                    didTap: {})
         }
 

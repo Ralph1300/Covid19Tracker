@@ -16,11 +16,11 @@ struct MainView: View {
 
     var body: some View {
         TabView {
-//            GeneralView()
-//                .tabItem {
-//                    Image(systemName: "heart.circle")
-//                    Text("Heute")
-//                }
+            GeneralView()
+                .tabItem {
+                    Image(systemName: "heart.circle")
+                    Text("Heute")
+                }
             StateView()
                 .tabItem {
                     Image(systemName: "person.circle")

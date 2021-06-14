@@ -11,8 +11,6 @@ struct GeneralView: View {
 
     @ObservedObject var viewModel: GeneralViewViewModel
 
-    @State var showsPositivesChart = false
-
     init(viewModel: GeneralViewViewModel = .init()) {
         self.viewModel = viewModel
     }
@@ -24,18 +22,15 @@ struct GeneralView: View {
                 case .loading:
                     ProgressView()
                 case .loaded, .error:
-                    if let commonInfo = viewModel.commonInfo {
+                    if let commonInfo = viewModel.timeline {
                         GeneralListView(commonInfo: commonInfo,
                                         infos: viewModel.infos,
-                                        formattedDate: viewModel.formattedDate, didTapInfo: { info in
-                                            self.handleTap(on: info)
+                                        formattedDate: viewModel.formattedDate, didTapInfo: { _ in
                                         })
                     } else {
                         Text("No info available, sorry.")
                     }
                 }
-            }
-            .sheet(isPresented: $showsPositivesChart) {
             }
             .navigationTitle("Heute")
             .navigationBarItems(trailing:
@@ -51,20 +46,10 @@ struct GeneralView: View {
             viewModel.load()
         }
     }
-
-    private func handleTap(on info: GeneralViewViewModel.Info) {
-        switch info.type {
-        case .positives:
-            break
-//            self.showsPositivesChart = true
-        default:
-            break
-        }
-    }
 }
 
 private struct GeneralListView: View {
-    let commonInfo: CommonInfo
+    let commonInfo: TimelineStates
     let infos: [GeneralViewViewModel.Info]
     let formattedDate: String
 
@@ -88,9 +73,9 @@ private struct GeneralListView: View {
 struct GeneralView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            GeneralView(viewModel: GeneralViewViewModel(remote: .shared, commonInfo: .stub()))
+            GeneralView(viewModel: GeneralViewViewModel(remote: .shared, timeline: .stub()))
 
-            GeneralView(viewModel: GeneralViewViewModel(remote: .shared, commonInfo: .stub()))
+            GeneralView(viewModel: GeneralViewViewModel(remote: .shared, timeline: .stub()))
                 .environment(\.colorScheme, .dark)
         }
     }

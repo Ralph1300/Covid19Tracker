@@ -19,7 +19,7 @@ final class GeneralViewViewModel: ObservableObject {
         let title: String
         let subTitle: String
         let increase: Int?
-        let type: CommonInfo.Info
+        let type: TimelineStates.InfoType
     }
 
     enum LoadingState {
@@ -29,6 +29,7 @@ final class GeneralViewViewModel: ObservableObject {
     private let remote: Remote
     private let userDefaults = UserDefaults(suiteName: "group.covid19")
     private(set) var infos: [Info] = []
+    private var timelines: [TimelineStates] = []
     private var cancellables: [AnyCancellable] = []
 
     private lazy var dateFormatter: DateFormatter = {
@@ -37,72 +38,62 @@ final class GeneralViewViewModel: ObservableObject {
         return dateFormatter
     }()
 
-    @Published var commonInfo: CommonInfo? {
+    @Published var timeline: TimelineStates? {
         didSet {
+            state = timeline == nil ? .error : .loaded
             makeInfos()
         }
     }
     @Published var state: LoadingState = .loading
-//    @Published var epiCurve: EpiCurve?
 
-    var infectedIncrease: Int? {
-//        guard let lastInfectedRaise = epiCurve?.entries.last?.cases else {
-//            return nil
-//        }
-        return nil
-    }
+    var infectedIncrease: Int?
 
     var formattedDate: String {
-        guard let info = commonInfo else {
+        guard let info = timeline else {
             return ""
         }
-        return dateFormatter.string(from: info.lastRefresh)
+        return dateFormatter.string(from: info.date)
     }
 
-    init(remote: Remote = .shared, commonInfo: CommonInfo? = nil) {
+    init(remote: Remote = .shared, timeline: TimelineStates? = nil) {
         self.remote = remote
-        self.commonInfo = commonInfo
+        self.timeline = timeline
 
-        if commonInfo != nil {
+        if timeline != nil {
             state = .loaded
         }
         makeInfos()
     }
 
     private func makeInfos() {
-        guard let commonInfo = commonInfo else {
+        guard let timeline = timeline else {
             return
         }
         var infos: [Info] = []
-        for infoCase in CommonInfo.Info.allCases {
+        for infoCase in TimelineStates.InfoType.allCases {
             var subTitle = ""
             var image: UIImage?
             var increase: Int?
             switch infoCase {
-            case .currentInfections:
-                subTitle = "\(commonInfo.currentInfections)"
+            case .cases:
+                subTitle = "\(timeline.confirmedCases)"
                 image = UIImage(systemName: "heart.fill")
-            case .positives:
-                subTitle = "\(commonInfo.positives)"
-                image = UIImage(systemName: "bandage.fill")
                 increase = infectedIncrease
-            case .tests:
-                subTitle = "\(commonInfo.tests)"
-                image = UIImage(systemName: "t.circle")
             case .recovered:
-                subTitle = "\(commonInfo.recovered)"
+                subTitle = "\(timeline.recovered)"
+                image = UIImage(systemName: "bandage.fill")
+            case .tests:
+                subTitle = "\(timeline.tests)"
+                image = UIImage(systemName: "t.circle")
+            case .deaths:
+                subTitle = "\(timeline.deaths)"
                 image = UIImage(systemName: "staroflife.fill")
-            case .dead:
-                subTitle = "\(commonInfo.deadConfirmed)"
+            case .intenseCare:
+                subTitle = "\(timeline.intensiveCare)"
                 image = UIImage(systemName: "waveform.path.ecg")
-            case .availableIntensiveCareBeds:
-                let percentage = Double(commonInfo.takenIntensiveBeds) / Double(commonInfo.takenIntensiveBeds + commonInfo.availableIntensiveBeds)
-                subTitle = String(format: "%.1f", (100 - percentage * 100)) + "%"
-                image = UIImage(systemName: "bed.double.fill")
-            case .availableNormalBedsPercentage:
-                let percentage = Double(commonInfo.takenNormalBeds) / Double(commonInfo.takenNormalBeds + commonInfo.availableNormalBeds)
-                subTitle = String(format: "%.1f", (100 - percentage * 100)) + "%"
-                image = UIImage(systemName: "bed.double.fill")
+            case .hospitalized:
+                subTitle = "\(timeline.hospitalized)"
+                image = UIImage(systemName: "waveform.path.ecg")
             }
             infos.append(Info(icon: image!,
                               title: infoCase.text,
@@ -114,11 +105,11 @@ final class GeneralViewViewModel: ObservableObject {
     }
 
     private func storeWidgetInformation() {
-        guard let increasedBy = infectedIncrease, let commonInfo = commonInfo else {
+        guard let timeline = timeline else {
             return
         }
-        let widgetInfo = WidgetInfo(infections: commonInfo.currentInfections,
-                                    increasedBy: increasedBy)
+        let widgetInfo = WidgetInfo(infections: timeline.confirmedCases,
+                                    increasedBy: 100) // TODO
         guard let data = try? JSONEncoder().encode(widgetInfo) else {
             return
         }
@@ -135,6 +126,18 @@ final class GeneralViewViewModel: ObservableObject {
     }
 
     func load() {
+        remote.fetchStateTimeline().sink(receiveCompletion: { _ in }) { [weak self] timelines in
+            let latestAustriaTimeLine = timelines.last // austria is always at the last position
+            let secondToLastAustriaTimeLine = timelines.dropLast().last(where: { $0.province == .austria })
+            
+            if let lastIncrease = latestAustriaTimeLine?.confirmedCases,
+               let secondToLastIncrease = secondToLastAustriaTimeLine?.confirmedCases {
+                self?.infectedIncrease = lastIncrease - secondToLastIncrease
+            }
+            self?.timeline = latestAustriaTimeLine
+        }
+        .store(in: &cancellables)
+        
         remote.fetchProvinceTimeline().sink(receiveCompletion: { _ in }) { values in
             print(values.count)
         }
